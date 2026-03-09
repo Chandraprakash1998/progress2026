@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 Progress Dashboard</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --accent-color: #38bdf8;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        h1 { font-weight: 300; letter-spacing: 2px; margin-bottom: 2rem; }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover { transform: translateY(-5px); }
+
+        .label { color: var(--text-dim); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
+        
+        .percentage {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 1rem 0;
+            color: var(--accent-color);
+        }
+
+        /* Progress Bar Styles */
+        .progress-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            height: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #0ea5e9, #38bdf8);
+            width: 0%;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .quotes-section {
+            margin-top: 4rem;
+            max-width: 800px;
+            text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 2rem;
+        }
+
+        .quote {
+            font-style: italic;
+            color: var(--text-dim);
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        footer { margin-top: auto; padding: 2rem; color: #475569; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+    <h1>YEAR 2026 PROGRESS</h1>
+
+    <div class="dashboard">
+        <div class="card">
+            <div class="label">Days Passed</div>
+            <div class="percentage" id="days-pct">0.00%</div>
+            <div class="progress-container"><div class="progress-bar" id="days-bar"></div></div>
+        </div>
+
+        <div class="card">
+            <div class="label">Hours Passed</div>
+            <div class="percentage" id="hours-pct">0.00%</div>
+            <div class="progress-container"><div class="progress-bar" id="hours-bar"></div></div>
+        </div>
+
+        <div class="card">
+            <div class="label">Minutes Passed</div>
+            <div class="percentage" id="mins-pct">0.00%</div>
+            <div class="progress-container"><div class="progress-bar" id="mins-bar"></div></div>
+        </div>
+
+        <div class="card">
+            <div class="label">Seconds Passed</div>
+            <div class="percentage" id="secs-pct">0.00%</div>
+            <div class="progress-container"><div class="progress-bar" id="secs-bar"></div></div>
+        </div>
+    </div>
+
+    <section class="quotes-section">
+        <div class="quote">"Lost time is never found again." — Benjamin Franklin</div>
+        <div class="quote">"The trouble is, you think you have time." — Jack Kornfield</div>
+        <div class="quote">"Time is what we want most, but what we use worst." — William Penn</div>
+    </section>
+
+    <footer>Current Date: <span id="current-date"></span></footer>
+
+    <script>
+        function updateProgress() {
+            const now = new Date();
+            const year = 2026;
+            
+            // Start of 2026
+            const startOfYear = new Date(year, 0, 1);
+            // End of 2026
+            const endOfYear = new Date(year + 1, 0, 1);
+            
+            // Total milliseconds in 2026 (365 days)
+            const totalMs = endOfYear - startOfYear;
+            const elapsedMs = now - startOfYear;
+
+            // Totals
+            const totalDays = 365;
+            const totalHours = totalDays * 24;
+            const totalMins = totalHours * 60;
+            const totalSecs = totalMins * 60;
+
+            // Calculations
+            const daysPassed = elapsedMs / (1000 * 60 * 60 * 24);
+            const hoursPassed = elapsedMs / (1000 * 60 * 60);
+            const minsPassed = elapsedMs / (1000 * 60);
+            const secsPassed = elapsedMs / 1000;
+
+            // Percentages
+            const pDay = (daysPassed / totalDays) * 100;
+            const pHour = (hoursPassed / totalHours) * 100;
+            const pMin = (minsPassed / totalMins) * 100;
+            const pSec = (secsPassed / totalSecs) * 100;
+
+            // Update DOM
+            updateElement('days', pDay, 2);
+            updateElement('hours', pHour, 4);
+            updateElement('mins', pMin, 5);
+            updateElement('secs', pSec, 6);
+
+            document.getElementById('current-date').innerText = now.toLocaleString();
+        }
+
+        function updateElement(id, value, decimals) {
+            // Clamp value between 0 and 100
+            const displayValue = Math.min(Math.max(value, 0), 100).toFixed(decimals);
+            document.getElementById(`${id}-pct`).innerText = displayValue + '%';
+            document.getElementById(`${id}-bar`).style.width = displayValue + '%';
+        }
+
+        // Initialize and sync
+        setInterval(updateProgress, 1000);
+        updateProgress();
+    </script>
+</body>
+</html>
